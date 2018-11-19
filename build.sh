@@ -7,17 +7,21 @@ SOURCE_DIR=${SOURCE_DIR:=""}
 CADDY_VERSION=${CADDY_VERSION:="ce0988f48a62bad7e2ca9509311ea77545af27b4"}
 CADDY_BUILD_VERSION=${CADDY_BUILD_VERSION:="c62e2219460a8828970dad09212c3a4cec40b56c"}
 
-mkdir -p /tmp/go /target/.cache
-export GOPATH=/tmp/go
-export GOCACHE=/target/.cache
+mkdir -p /target/.gopath /target/.gocache
+export GOPATH=/target/.gopath
+export GOCACHE=/target/.gocache
+
+test -L "$GOPATH/src/github.com/mholt/caddy" && rm "$GOPATH/src/github.com/mholt/caddy" || true
 
 if [ -z "$SOURCE_DIR" ]; then
   go get github.com/mholt/caddy/caddy
   cd "$GOPATH/src/github.com/mholt/caddy" && git checkout "$CADDY_VERSION" && git submodule update --init --recursive
 else
-  test -d "$SOURCE_DIR/caddy" || (echo "Source code not found"; false)
+  test -d "/target/$SOURCE_DIR/caddy" || (echo "Source code not found"; false)
+  test -d "$GOPATH/src/github.com/mholt/caddy" && rm -fR "$GOPATH/src/github.com/mholt/caddy" || true
+
   mkdir -p "$GOPATH/src/github.com/mholt"
-  ln -s "$SOURCE_DIR" "$GOPATH/src/github.com/mholt/caddy"
+  ln -s "/target/$SOURCE_DIR" "$GOPATH/src/github.com/mholt/caddy"
 fi
 
 go get github.com/caddyserver/builds

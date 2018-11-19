@@ -2,6 +2,7 @@
 all: build container
 
 CADDY_VERSION?="ce0988f48a62bad7e2ca9509311ea77545af27b4"
+SOURCE_DIR:=""
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date +%s)
 
@@ -11,7 +12,7 @@ TIMESTAMP := $(shell date +%s)
 
 caddy: .build-container.image
 	$(eval IMAGE_LABEL := $(shell cat .build-container.image))
-	docker run -e CADDY_VERSION=$(CADDY_VERSION) -v "$(PWD)":/target -u $(shell id -u):$(shell id -g) "$(IMAGE_LABEL)"
+	docker run -e CADDY_VERSION=$(CADDY_VERSION) -v "$(PWD)":/target -u $(shell id -u):$(shell id -g) -e SOURCE_DIR=${SOURCE_DIR} "$(IMAGE_LABEL)"
 
 .run-container.image: caddy Dockerfile index.html
 	$(eval IMAGE_LABEL := "caddy-run:$(GIT_HASH)-$(TIMESTAMP)")
@@ -27,4 +28,5 @@ run: container
 clean:
 	@rm -f caddy
 	@rm -f .*.image
-	@rm -fr .cache
+	@rm -fr .gocache
+	@rm -fr .gopath
