@@ -14,8 +14,11 @@ export GOCACHE=/target/.gocache
 test -L "$GOPATH/src/github.com/mholt/caddy" && rm "$GOPATH/src/github.com/mholt/caddy" || true
 
 if [ -z "$SOURCE_DIR" ]; then
-  go get github.com/mholt/caddy/caddy
-  cd "$GOPATH/src/github.com/mholt/caddy" && git checkout "$CADDY_VERSION" && git submodule update --init --recursive
+  test -d "$GOPATH/src/github.com/mholt/caddy" || git clone https://github.com/mholt/caddy "$GOPATH/src/github.com/mholt/caddy"
+  cd "$GOPATH/src/github.com/mholt/caddy" && \
+    git fetch origin "$CADDY_VERSION" && \
+    git reset --hard FETCH_HEAD && \
+    git submodule update --init --recursive
 else
   test -d "/target/$SOURCE_DIR/caddy" || (echo "Source code not found"; false)
   test -d "$GOPATH/src/github.com/mholt/caddy" && rm -fR "$GOPATH/src/github.com/mholt/caddy" || true
@@ -25,7 +28,9 @@ else
 fi
 
 go get github.com/caddyserver/builds
-cd "$GOPATH/src/github.com/caddyserver/builds" && git checkout $CADDY_BUILD_VERSION && git submodule update --init --recursive
+cd "$GOPATH/src/github.com/caddyserver/builds" && \
+  git checkout $CADDY_BUILD_VERSION && \
+  git submodule update --init --recursive
 
 cd "$GOPATH/src/github.com/mholt/caddy/caddy"
 
