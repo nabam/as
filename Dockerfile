@@ -4,4 +4,4 @@ COPY caddy /usr/bin
 WORKDIR /caddy
 COPY index.html /caddy/index.html
 
-ENTRYPOINT caddy
+ENTRYPOINT ["caddy"]

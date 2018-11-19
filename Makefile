@@ -9,5 +9,5 @@ build-container: build
 	docker build . -f Dockerfile -t "caddy-run"
 
 run: build-container
-	docker run -p 2015:2015 -ti caddy-run:latest
+	docker run -p 8080:8080 -ti caddy-run:latest -port 8080
 
