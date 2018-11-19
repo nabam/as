@@ -1,0 +1,23 @@
+# Instead of this I would better use https://hub.docker.com/_/golang/ or https://github.com/GoogleCloudPlatform/cloud-builders/tree/master/go
+
+FROM ubuntu:bionic
+
+RUN apt-get update && \
+    apt-get -y install curl git
+
+ARG GO_ARCHIVE=go1.11.2.linux-amd64.tar.gz
+ARG GO_CHECKSUM=1dfe664fa3d8ad714bbd15a36627992effd150ddabd7523931f077b3926d736d
+
+RUN curl -s https://dl.google.com/go/$GO_ARCHIVE -o /tmp/go-linux.tar.gz && \
+    test "$(sha256sum /tmp/go-linux.tar.gz | cut -f 1 -d' ')" = "$GO_CHECKSUM" && \
+    tar -C /opt -zxf /tmp/go-linux.tar.gz
+
+RUN mkdir /go
+ENV PATH=/opt/go/bin:${PATH}
+
+VOLUME /target
+
+COPY build.sh /build.sh
+RUN chmod 755 /build.sh
+
+ENTRYPOINT /build.sh
